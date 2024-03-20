@@ -35,7 +35,15 @@
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <!-- highlight -->
     <script type="text/javascript" src="_content/FluentUI.Demo.Shared/js/highlight-extensions.js"></script>
-    <!-- Touch emulator, included for better browser compatibility for PullToRefresh component -->
+
+    <!--
+        Touch emulator, included for better browser compatibility for `FluentPullToRefresh` component.
+        This is included to enable touch events on desktop and to add compatibility Load touch emulator.
+    -->
     <script type="text/javascript" src="_content/FluentUI.Demo.Shared/js/vant-touch-emulator.js"></script>
+    <script>
+        window.loadTouchEmulator();
+    </script>
+
 </body>
 </html>

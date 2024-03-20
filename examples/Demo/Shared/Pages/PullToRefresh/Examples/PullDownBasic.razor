@@ -1,0 +1,16 @@
+﻿<FluentPullToRefresh Direction="@PullDirection.Down" OnRefreshAsync="OnRefreshAsync">
+    <div style="height: 150px">
+        My content to refresh: @Counter
+    </div>
+</FluentPullToRefresh>
+
+@code {
+    int Counter = 0;
+
+    async Task<bool> OnRefreshAsync()
+    {
+        Counter++;
+        await Task.Delay(1000);
+        return true;
+    }
+}

@@ -41,7 +41,7 @@ public partial class FluentPullToRefresh : FluentComponentBase
     /// returns whether there is more data
     /// </summary>
     [Parameter]
-    public Func<Task<bool>>? OnRefresh { get; set; }
+    public Func<Task<bool>>? OnRefreshAsync { get; set; }
 
     [Parameter]
     public RenderFragment PullingTemplate { get; set; } = builder =>
@@ -73,7 +73,7 @@ public partial class FluentPullToRefresh : FluentComponentBase
     public RenderFragment NoDataTemplate { get; set; } = builder =>
     {
         builder.AddContent(0, "No more data");
-};
+    };
 
     [Parameter]
     public int MaxDistance { get; set; } = 50;
@@ -102,21 +102,19 @@ public partial class FluentPullToRefresh : FluentComponentBase
         return renderFragment;
     }
 
-    private string GetWrapperStyle()
-    {
-        return _pullStatus switch
-        {
-            PullStatus.Awaiting => "",
-            _ => _wrapperStyle,
-        };
-    }
+    protected virtual string? WrapperStyle => new StyleBuilder()
+        .AddStyle("position", "relative")
+        .AddStyle("user-select", "none")
+        .AddStyle(_pullStatus == PullStatus.Awaiting ? null : _wrapperStyle)
+        .Build();
 
-    private void OnTouchStart(TouchEventArgs e)
+    private Task OnTouchStartAsync(TouchEventArgs e)
     {
         if (_pullStatus == PullStatus.NoData)
         {
-            return;
+            return Task.CompletedTask;
         }
+
         if (_pullStatus == PullStatus.Awaiting || _pullStatus == PullStatus.Completed)
         {
             SetPullStatus(PullStatus.Pulling);
@@ -125,6 +123,8 @@ public partial class FluentPullToRefresh : FluentComponentBase
             // When the touch starts, the animation time and movement distance are set to 0
             _moveDistance = 0;
         }
+
+        return Task.CompletedTask;
     }
 
     private async Task OnTouchMoveAsync(TouchEventArgs e)
@@ -146,7 +146,7 @@ public partial class FluentPullToRefresh : FluentComponentBase
     private async Task OnTouchMoveDownAsync(TouchEventArgs e)
     {
         if (_jsModule is not null)
-{
+        {
             // If document is a scroll bar, touch sliding is a simple way to scroll up and down the page
             var distToTop = await _jsModule.InvokeAsync<int>("getScrollDistToTop");
 
@@ -192,11 +192,11 @@ public partial class FluentPullToRefresh : FluentComponentBase
             SetPullStatus(PullStatus.Loading);
 
             var hasMoreData = true;
-            if (OnRefresh is not null)
+            if (OnRefreshAsync is not null)
             {
                 try
                 {
-                    hasMoreData = await OnRefresh.Invoke();
+                    hasMoreData = await OnRefreshAsync.Invoke();
                 }
                 catch (Exception)
                 {
@@ -204,12 +204,7 @@ public partial class FluentPullToRefresh : FluentComponentBase
                     throw;
                 }
             }
-#if DEBUG
-            else
-            {
-                await Task.Delay(1000);
-            }
-#endif
+
             _wrapperStyle = $"transform: translate3d(0, 0, 0);";
             if (!hasMoreData)
             {
@@ -220,7 +215,6 @@ public partial class FluentPullToRefresh : FluentComponentBase
             {
                 SetPullStatus(PullStatus.Completed);
             }
-            //StateHasChanged();
 
             SetDistance(-1);
         }

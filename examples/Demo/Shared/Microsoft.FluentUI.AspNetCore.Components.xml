@@ -6431,7 +6431,7 @@
         <member name="P:Microsoft.FluentUI.AspNetCore.Components.FluentPullToRefresh.StyleValue">
             <summary />
         </member>
-        <member name="P:Microsoft.FluentUI.AspNetCore.Components.FluentPullToRefresh.OnRefresh">
+        <member name="P:Microsoft.FluentUI.AspNetCore.Components.FluentPullToRefresh.OnRefreshAsync">
             <summary>
             returns whether there is more data
             </summary>
